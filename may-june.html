@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ПЛАН ТРЕНИРОВОК</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Manrope:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #131313;
+    --surface-raised: #1a1a1a;
+    --border: #252525;
+    --text: #e8e8e8;
+    --text-dim: #787878;
+    --accent: #ff3c00;
+    --accent-glow: rgba(255, 60, 0, 0.15);
+    --green: #00e676;
+    --yellow: #ffd600;
+    --cyan: #00e5ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--accent);
+  }
+
+  .header-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    line-height: 0.95;
+    letter-spacing: 2px;
+  }
+
+  h1 span {
+    display: block;
+    font-size: 0.45em;
+    color: var(--text-dim);
+    letter-spacing: 4px;
+    margin-top: 4px;
+  }
+
+  .dates {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 10px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  /* ── WEEK TABS ── */
+  .week-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .week-tabs::-webkit-scrollbar { display: none; }
+
+  .week-tab {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px;
+    letter-spacing: 1px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-dim);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    text-align: center;
+    min-width: 56px;
+  }
+
+  .week-tab.active {
+    color: var(--text);
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .week-tab .week-date {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    opacity: 0.7;
+    margin-top: 2px;
+    letter-spacing: 0;
+  }
+
+  .week-content {
+    margin-top: 12px;
+  }
+
+  .week-panel { display: none; animation: fadeIn 0.2s ease; }
+  .week-panel.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ── DAY CARDS (mobile stack) ── */
+  .days-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .day-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    border-left: 3px solid #333;
+  }
+
+  .day-card.rest { border-left-color: #333; opacity: 0.5; }
+  .day-card.boxing { border-left-color: var(--yellow); }
+  .day-card.run { border-left-color: var(--green); }
+  .day-card.gym { border-left-color: var(--accent); }
+
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .day-card.rest .day-header { padding: 10px 14px; }
+
+  .day-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    min-width: 30px;
+  }
+
+  .day-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .day-type {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin-left: auto;
+  }
+
+  .day-card.rest .day-type { background: rgba(255,255,255,0.04); color: #555; }
+  .day-card.boxing .day-type { background: rgba(255,214,0,0.1); color: var(--yellow); }
+  .day-card.run .day-type { background: rgba(0,230,118,0.1); color: var(--green); }
+  .day-card.gym .day-type { background: rgba(255,60,0,0.1); color: var(--accent); }
+
+  .day-body {
+    padding: 0 14px 12px;
+  }
+
+  .day-card.rest .day-body { display: none; }
+
+  /* Exercises */
+  .exercise-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px solid #1a1a1a;
+  }
+
+  .exercise-row:last-child { border-bottom: none; }
+
+  .ex-name {
+    font-size: 13px;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .ex-spec {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--cyan);
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
+  .ex-spec.max-reps { color: var(--accent); font-weight: 600; }
+
+  .workout-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .run-detail {
+    font-size: 13px;
+    padding: 4px 0;
+  }
+
+  .run-detail .val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--green);
+  }
+
+  .boxing-label {
+    font-size: 13px;
+    color: var(--yellow);
+    padding: 4px 0;
+  }
+
+  /* ── GOALS ── */
+  .goals-section { margin-top: 36px; }
+
+  .goals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .goal-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .goal-icon {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    background: rgba(255,60,0,0.1);
+    border: 1px solid rgba(255,60,0,0.2);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .goal-text {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .goal-text .metric {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    margin-left: 4px;
+  }
+
+  /* ── PROGRESSION ── */
+  .prog-section { margin-top: 36px; }
+
+  .prog-group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+
+  .prog-group-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 17px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .prog-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px solid #1a1a1a;
+    font-size: 13px;
+  }
+
+  .prog-line:last-child { border-bottom: none; }
+
+  .prog-line .prog-ex { font-weight: 500; }
+
+  .prog-line.prog-sub {
+    padding-left: 16px;
+    border-bottom-color: #141414;
+  }
+
+  .prog-line.prog-sub .prog-ex {
+    font-weight: 400;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .prog-line .prog-step {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--cyan);
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
+  .prog-note {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <span class="header-label">Training Program</span>
+    <h1>ПЛАН ТРЕНИРОВОК<span>МАЙ — ИЮНЬ 2026</span></h1>
+    <div class="dates">27.04 — 27.06 / 8 НЕДЕЛЬ</div>
+  </header>
+
+  <section>
+    <div class="section-title">НЕДЕЛЯ</div>
+    <div class="week-tabs" id="weekTabs"></div>
+    <div class="week-content" id="weekContent"></div>
+  </section>
+
+  <section class="goals-section">
+    <div class="section-title">ЦЕЛИ</div>
+    <div class="goals-list">
+      <div class="goal-item">
+        <div class="goal-icon">//</div>
+        <div class="goal-text">Не пропускать тренировки <span class="metric">100%</span></div>
+      </div>
+      <div class="goal-item">
+        <div class="goal-icon">~</div>
+        <div class="goal-text">Темп бега <span class="metric">6:00/км @ 70% HR</span></div>
+      </div>
+      <div class="goal-item">
+        <div class="goal-icon">^</div>
+        <div class="goal-text">Подтягивания <span class="metric">20 раз</span></div>
+      </div>
+      <div class="goal-item">
+        <div class="goal-icon">+</div>
+        <div class="goal-text">Брусья <span class="metric">15 раз +15кг</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="prog-section">
+    <div class="section-title">ПРОГРЕССИЯ</div>
+
+    <div class="prog-group">
+      <div class="prog-group-title">A — ГРУДЬ / ТРИЦЕПС</div>
+      <div class="prog-line"><span class="prog-ex">Брусья</span><span class="prog-step">+3 повт.</span></div>
+      <div class="prog-line prog-sub"><span class="prog-ex prog-indent">+5 кг + 3 повт.</span></div>
+      <div class="prog-line prog-sub"><span class="prog-ex prog-indent">+10 кг + 3 повт.</span></div>
+      <div class="prog-line prog-sub"><span class="prog-ex prog-indent">+15 кг + 3 повт.</span></div>
+      <div class="prog-line"><span class="prog-ex">Наклонный жим</span><span class="prog-step">+5 кг</span></div>
+      <div class="prog-line"><span class="prog-ex">Пулловер</span><span class="prog-step">+2.5 кг</span></div>
+      <div class="prog-line"><span class="prog-ex">Жим узким хватом</span><span class="prog-step">+5 кг</span></div>
+      <div class="prog-line"><span class="prog-ex">Трицепс пуш-даун</span><span class="prog-step">+5 кг</span></div>
+    </div>
+
+    <div class="prog-group">
+      <div class="prog-group-title">B — СПИНА / БИЦЕПС</div>
+      <div class="prog-line"><span class="prog-ex">Подтягивания</span><span class="prog-step">+2 повт.</span></div>
+      <div class="prog-line"><span class="prog-ex">Становая тяга</span><span class="prog-step">+10 кг</span></div>
+      <div class="prog-line"><span class="prog-ex">Тяга перед собой</span><span class="prog-step">+5 кг</span></div>
+      <div class="prog-line"><span class="prog-ex">Штанга на бицепс</span><span class="prog-step">+2.5 кг</span></div>
+      <div class="prog-line"><span class="prog-ex">Молотки</span><span class="prog-step">+2.5 кг</span></div>
+    </div>
+
+    <div class="prog-group">
+      <div class="prog-group-title">C — НОГИ / ПЛЕЧИ</div>
+      <div class="prog-line"><span class="prog-ex">Подтягивания</span><span class="prog-step">+2 повт.</span></div>
+      <div class="prog-line"><span class="prog-ex">Приседания</span><span class="prog-step">+10 кг</span></div>
+      <div class="prog-line"><span class="prog-ex">Армейский жим стоя</span><span class="prog-step">+5 кг</span></div>
+      <div class="prog-line"><span class="prog-ex">Тяга гантели</span><span class="prog-step">+2.5 кг</span></div>
+      <div class="prog-line"><span class="prog-ex">Махи гантелей</span><span class="prog-step">+2.5 кг</span></div>
+    </div>
+
+    <div class="prog-note">* Прогрессия — каждую тренировку накидывать указанный вес. Если 2 гантели — вес суммарный, делить на 2.</div>
+  </section>
+
+</div>
+
+<script>
+const DAYS = ['ПН','ВТ','СР','ЧТ','ПТ','СБ','ВС'];
+const MONTHS = ['','янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'];
+const startDate = new Date(2026, 3, 27);
+
+const workouts = {
+  A: {
+    label: 'A — ГРУДЬ / ТРИЦЕПС',
+    exercises: [
+      ['Брусья', '3 подх.', ''],
+      ['Наклонный жим', '4', '8'],
+      ['Пулловер', '4', '10'],
+      ['Жим узким хватом', '4', '10'],
+      ['Трицепс пуш-даун', '4', '12'],
+    ]
+  },
+  B: {
+    label: 'B — СПИНА / БИЦЕПС',
+    exercises: [
+      ['Подтягивания', '3 подх.', ''],
+      ['Становая тяга', '4', '8'],
+      ['Тяга перед собой', '4', '10'],
+      ['Штанга на бицепс', '4', '10'],
+      ['Молотки', '4', '12'],
+    ]
+  },
+  C: {
+    label: 'C — НОГИ / ПЛЕЧИ',
+    exercises: [
+      ['Подтягивания', '3 подх.', ''],
+      ['Приседания', '4', '8'],
+      ['Армейский жим стоя', '4', '10'],
+      ['Тяга гантели', '4', '10'],
+      ['Махи гантелей', '4', '12'],
+    ]
+  }
+};
+
+const rotation = ['A','B','C'];
+let gymIdx = 0;
+
+function ds(d) { return d.getDate() + ' ' + MONTHS[d.getMonth()+1]; }
+
+function buildDay(dow, date, gym) {
+  const dt = ds(date);
+  if (dow === 0) return `<div class="day-card rest"><div class="day-header"><div class="day-name">ПН</div><div class="day-date">${dt}</div><div class="day-type">ОТДЫХ</div></div><div class="day-body"></div></div>`;
+
+  if (dow === 1 || dow === 3) return `<div class="day-card boxing"><div class="day-header"><div class="day-name">${DAYS[dow]}</div><div class="day-date">${dt}</div><div class="day-type">БОКС</div></div><div class="day-body"><div class="boxing-label">Тренировка по боксу</div></div></div>`;
+
+  if (dow === 2 || dow === 5) return `<div class="day-card run"><div class="day-header"><div class="day-name">${DAYS[dow]}</div><div class="day-date">${dt}</div><div class="day-type">КАРДИО</div></div><div class="day-body"><div class="run-detail">Бег <span class="val">60 мин</span> пульс <span class="val">70%</span></div><div class="run-detail" style="margin-top:4px;padding-top:4px;border-top:1px solid #1e1e1e">Брусья — 3xMAX</div><div class="run-detail">Подтягивания — 3xMAX</div></div></div>`;
+
+  if (dow === 4 || dow === 6) {
+    const w = workouts[gym];
+    const rows = w.exercises.map(e =>
+      `<div class="exercise-row"><div class="ex-name">${e[0]}</div><div class="ex-spec">${e[2] ? e[1]+'x'+e[2] : e[1]}</div></div>`
+    ).join('');
+    return `<div class="day-card gym"><div class="day-header"><div class="day-name">${DAYS[dow]}</div><div class="day-date">${dt}</div><div class="day-type">ЗАЛ</div></div><div class="day-body"><div class="workout-label">${w.label}</div>${rows}</div></div>`;
+  }
+}
+
+const tabsEl = document.getElementById('weekTabs');
+const contentEl = document.getElementById('weekContent');
+
+for (let w = 0; w < 8; w++) {
+  const ws = new Date(startDate); ws.setDate(ws.getDate() + w*7);
+  const we = new Date(ws); we.setDate(we.getDate() + 6);
+
+  const tab = document.createElement('button');
+  tab.className = 'week-tab' + (w===0?' active':'');
+  tab.innerHTML = `${w+1}<span class="week-date">${ds(ws).split(' ')[0]}-${ds(we).split(' ')[0]} ${MONTHS[ws.getMonth()+1]}</span>`;
+  tab.onclick = () => switchWeek(w);
+  tabsEl.appendChild(tab);
+
+  let html = '<div class="days-stack">';
+  for (let d = 0; d < 7; d++) {
+    const date = new Date(ws); date.setDate(date.getDate() + d);
+    let gym = null;
+    if (d === 4 || d === 6) { gym = rotation[gymIdx % 3]; gymIdx++; }
+    html += buildDay(d, date, gym);
+  }
+  html += '</div>';
+
+  const panel = document.createElement('div');
+  panel.className = 'week-panel' + (w===0?' active':'');
+  panel.innerHTML = html;
+  contentEl.appendChild(panel);
+}
+
+function switchWeek(i) {
+  document.querySelectorAll('.week-tab').forEach((t,j) => t.classList.toggle('active', i===j));
+  document.querySelectorAll('.week-panel').forEach((p,j) => p.classList.toggle('active', i===j));
+}
+</script>
+
+</body>
+</html>
